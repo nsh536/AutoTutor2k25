@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, XCircle, ArrowRight, Trophy } from "lucide-react";
 
 export interface QuizQuestion {
   question: string;
@@ -16,9 +16,20 @@ interface QuizCardProps {
   questionNumber: number;
   totalQuestions: number;
   onAnswer: (isCorrect: boolean) => void;
+  onNext: () => void;
+  showNextButton: boolean;
+  isLastQuestion: boolean;
 }
 
-export function QuizCard({ question, questionNumber, totalQuestions, onAnswer }: QuizCardProps) {
+export function QuizCard({ 
+  question, 
+  questionNumber, 
+  totalQuestions, 
+  onAnswer,
+  onNext,
+  showNextButton,
+  isLastQuestion
+}: QuizCardProps) {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
 
@@ -47,7 +58,7 @@ export function QuizCard({ question, questionNumber, totalQuestions, onAnswer }:
               <div
                 key={i}
                 className={cn(
-                  "w-2 h-2 rounded-full",
+                  "w-2 h-2 rounded-full transition-colors",
                   i < questionNumber - 1
                     ? "bg-primary"
                     : i === questionNumber - 1
@@ -73,15 +84,21 @@ export function QuizCard({ question, questionNumber, totalQuestions, onAnswer }:
                 disabled={showResult}
                 className={cn(
                   "w-full p-4 rounded-xl text-left transition-all border-2",
-                  !showResult && "hover:border-primary/50 hover:bg-secondary",
+                  !showResult && "hover:border-primary/50 hover:bg-secondary cursor-pointer",
                   isSelected && !showResult && "border-primary bg-primary/10",
                   showResult && isCorrectOption && "border-success bg-success/10",
                   showResult && isSelected && !isCorrectOption && "border-destructive bg-destructive/10",
-                  !isSelected && !showResult && "border-border"
+                  !isSelected && !showResult && "border-border",
+                  showResult && !isSelected && !isCorrectOption && "border-border opacity-50"
                 )}
               >
                 <div className="flex items-center gap-3">
-                  <span className="flex-shrink-0 w-8 h-8 rounded-lg bg-secondary flex items-center justify-center font-semibold text-sm">
+                  <span className={cn(
+                    "flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center font-semibold text-sm transition-colors",
+                    showResult && isCorrectOption ? "bg-success text-success-foreground" :
+                    showResult && isSelected && !isCorrectOption ? "bg-destructive text-destructive-foreground" :
+                    isSelected ? "bg-primary text-primary-foreground" : "bg-secondary"
+                  )}>
                     {String.fromCharCode(65 + index)}
                   </span>
                   <span className="flex-1">{option}</span>
@@ -98,22 +115,54 @@ export function QuizCard({ question, questionNumber, totalQuestions, onAnswer }:
         </div>
 
         {showResult && question.explanation && (
-          <div className="p-4 rounded-xl bg-secondary animate-slide-up">
-            <p className="text-sm font-medium mb-1">Explanation:</p>
+          <div className={cn(
+            "p-4 rounded-xl animate-slide-up",
+            isCorrect ? "bg-success/10 border border-success/20" : "bg-secondary"
+          )}>
+            <p className="text-sm font-medium mb-1 flex items-center gap-2">
+              {isCorrect ? (
+                <>
+                  <CheckCircle className="h-4 w-4 text-success" />
+                  Correct!
+                </>
+              ) : (
+                "Explanation:"
+              )}
+            </p>
             <p className="text-sm text-muted-foreground">{question.explanation}</p>
           </div>
         )}
 
-        {!showResult && (
-          <Button
-            variant="hero"
-            className="w-full"
-            onClick={handleSubmit}
-            disabled={selectedAnswer === null}
-          >
-            Submit Answer
-          </Button>
-        )}
+        <div className="flex gap-3">
+          {!showResult ? (
+            <Button
+              variant="hero"
+              className="w-full"
+              onClick={handleSubmit}
+              disabled={selectedAnswer === null}
+            >
+              Submit Answer
+            </Button>
+          ) : (
+            <Button
+              variant="hero"
+              className="w-full"
+              onClick={onNext}
+            >
+              {isLastQuestion ? (
+                <>
+                  <Trophy className="h-4 w-4 mr-2" />
+                  View Results
+                </>
+              ) : (
+                <>
+                  Next Question
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </>
+              )}
+            </Button>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
