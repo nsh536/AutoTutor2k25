@@ -5,6 +5,8 @@ import { QuizCard, QuizQuestion } from "@/components/quiz/QuizCard";
 import { QuizResults } from "@/components/quiz/QuizResults";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 type QuizState = "generate" | "playing" | "results";
 
@@ -14,101 +16,59 @@ const Quiz = () => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [answeredCurrent, setAnsweredCurrent] = useState(false);
+  const { toast } = useToast();
 
   const generateQuiz = async (topic: string, difficulty: string, count: number) => {
     setIsLoading(true);
     
-    // Simulate AI quiz generation (replace with actual API call)
-    setTimeout(() => {
-      const mockQuestions = generateMockQuestions(topic, difficulty, count);
-      setQuestions(mockQuestions);
-      setCurrentQuestion(0);
-      setScore(0);
-      setState("playing");
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-quiz", {
+        body: { topic, difficulty, count }
+      });
+
+      if (error) throw error;
+
+      if (data?.questions && Array.isArray(data.questions)) {
+        setQuestions(data.questions);
+        setCurrentQuestion(0);
+        setScore(0);
+        setAnsweredCurrent(false);
+        setState("playing");
+        
+        toast({
+          title: "Quiz Ready!",
+          description: `${data.questions.length} questions about ${topic}`,
+        });
+      } else {
+        throw new Error("Invalid quiz data received");
+      }
+    } catch (error) {
+      console.error("Quiz generation error:", error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to generate quiz",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-    }, 2000);
-  };
-
-  const generateMockQuestions = (topic: string, difficulty: string, count: number): QuizQuestion[] => {
-    // Mock questions based on topic
-    const baseQuestions: QuizQuestion[] = [
-      {
-        question: `What is the primary process by which plants convert sunlight into energy?`,
-        options: ["Respiration", "Photosynthesis", "Fermentation", "Decomposition"],
-        correctAnswer: 1,
-        explanation: "Photosynthesis is the process where plants use sunlight, water, and carbon dioxide to create glucose and oxygen.",
-      },
-      {
-        question: `Which organelle contains chlorophyll in plant cells?`,
-        options: ["Mitochondria", "Nucleus", "Chloroplast", "Ribosome"],
-        correctAnswer: 2,
-        explanation: "Chloroplasts contain chlorophyll, the green pigment that absorbs light energy for photosynthesis.",
-      },
-      {
-        question: `What gas do plants release during photosynthesis?`,
-        options: ["Carbon dioxide", "Nitrogen", "Oxygen", "Hydrogen"],
-        correctAnswer: 2,
-        explanation: "Plants release oxygen as a byproduct of photosynthesis, which is essential for most life on Earth.",
-      },
-      {
-        question: `Which part of the plant is mainly responsible for photosynthesis?`,
-        options: ["Roots", "Stem", "Leaves", "Flowers"],
-        correctAnswer: 2,
-        explanation: "Leaves have the highest concentration of chloroplasts and are optimized for capturing sunlight.",
-      },
-      {
-        question: `What is the main source of energy for photosynthesis?`,
-        options: ["Water", "Soil nutrients", "Sunlight", "Air"],
-        correctAnswer: 2,
-        explanation: "Sunlight provides the energy needed to drive the chemical reactions of photosynthesis.",
-      },
-      {
-        question: `What substance is produced by plants during photosynthesis?`,
-        options: ["Protein", "Glucose", "Fat", "Vitamin"],
-        correctAnswer: 1,
-        explanation: "Glucose (a type of sugar) is the primary product of photosynthesis, used for energy and growth.",
-      },
-      {
-        question: `Where does the water used in photosynthesis come from?`,
-        options: ["Air", "Leaves", "Roots", "Sunlight"],
-        correctAnswer: 2,
-        explanation: "Water is absorbed by the roots and transported through the stem to the leaves.",
-      },
-      {
-        question: `What is chlorophyll?`,
-        options: ["A type of sugar", "A green pigment", "A plant hormone", "A vitamin"],
-        correctAnswer: 1,
-        explanation: "Chlorophyll is a green pigment in plants that absorbs light energy for photosynthesis.",
-      },
-      {
-        question: `Which gas do plants absorb from the air for photosynthesis?`,
-        options: ["Oxygen", "Nitrogen", "Carbon dioxide", "Helium"],
-        correctAnswer: 2,
-        explanation: "Plants absorb carbon dioxide through tiny pores called stomata on their leaves.",
-      },
-      {
-        question: `At what time of day is photosynthesis most active?`,
-        options: ["Night", "Morning", "Daytime", "Evening"],
-        correctAnswer: 2,
-        explanation: "Photosynthesis requires light, so it's most active during the day when sunlight is available.",
-      },
-    ];
-
-    return baseQuestions.slice(0, count);
+    }
   };
 
   const handleAnswer = (isCorrect: boolean) => {
     if (isCorrect) {
       setScore(prev => prev + 1);
     }
-    
-    setTimeout(() => {
-      if (currentQuestion < questions.length - 1) {
-        setCurrentQuestion(prev => prev + 1);
-      } else {
-        setState("results");
-      }
-    }, 1500);
+    setAnsweredCurrent(true);
+  };
+
+  const handleNext = () => {
+    if (currentQuestion < questions.length - 1) {
+      setCurrentQuestion(prev => prev + 1);
+      setAnsweredCurrent(false);
+    } else {
+      setState("results");
+    }
   };
 
   const handleRetry = () => {
@@ -116,6 +76,7 @@ const Quiz = () => {
     setQuestions([]);
     setCurrentQuestion(0);
     setScore(0);
+    setAnsweredCurrent(false);
   };
 
   return (
@@ -142,10 +103,14 @@ const Quiz = () => {
               </Button>
               
               <QuizCard
+                key={currentQuestion}
                 question={questions[currentQuestion]}
                 questionNumber={currentQuestion + 1}
                 totalQuestions={questions.length}
                 onAnswer={handleAnswer}
+                onNext={handleNext}
+                showNextButton={answeredCurrent}
+                isLastQuestion={currentQuestion === questions.length - 1}
               />
             </div>
           )}
