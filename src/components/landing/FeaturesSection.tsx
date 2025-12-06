@@ -1,40 +1,49 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MessageSquare, FileQuestion, Mic, Image, Globe, Clock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const features = [
   {
     icon: MessageSquare,
     title: "AI Chat Tutor",
     description: "Ask any question and get detailed, easy-to-understand explanations instantly. Like having a patient teacher available 24/7.",
+    link: "/chat",
   },
   {
     icon: FileQuestion,
     title: "Quiz Generator",
     description: "Generate custom quizzes on any topic to test your knowledge. Get immediate feedback and track your progress.",
+    link: "/quiz",
   },
   {
     icon: Mic,
     title: "Voice Input",
     description: "Speak your questions naturally. Our AI transcribes and responds, making learning more accessible and hands-free.",
+    link: "/chat",
   },
   {
     icon: Image,
     title: "Visual Learning",
     description: "Request educational illustrations and diagrams generated on demand to enhance your understanding of complex concepts.",
+    link: "/chat",
   },
   {
     icon: Globe,
     title: "Any Subject",
     description: "From mathematics to history, science to literature. Our AI tutor is trained to help with virtually any academic subject.",
+    link: "/chat",
   },
   {
     icon: Clock,
     title: "Learn Anytime",
     description: "No scheduling needed. Access your personal tutor whenever inspiration strikes, day or night.",
+    link: "/chat",
   },
 ];
 
 export function FeaturesSection() {
+  const navigate = useNavigate();
+
   return (
     <section className="py-24 relative">
       <div className="container mx-auto px-4">
@@ -57,8 +66,9 @@ export function FeaturesSection() {
               <Card 
                 key={index} 
                 variant="feature"
-                className="group animate-slide-up"
+                className="group animate-slide-up cursor-pointer"
                 style={{ animationDelay: `${index * 0.1}s` }}
+                onClick={() => navigate(feature.link)}
               >
                 <CardHeader>
                   <div className="w-12 h-12 rounded-xl gradient-hero flex items-center justify-center mb-4 transition-transform group-hover:scale-110">
