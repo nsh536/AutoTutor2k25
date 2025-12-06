@@ -5,10 +5,39 @@ interface ChatMessageProps {
   role: "user" | "assistant";
   content: string;
   isLoading?: boolean;
+  image?: string;
 }
 
-export function ChatMessage({ role, content, isLoading }: ChatMessageProps) {
+export function ChatMessage({ role, content, isLoading, image }: ChatMessageProps) {
   const isUser = role === "user";
+
+  // Parse markdown-like formatting for better display
+  const formatContent = (text: string) => {
+    // Split by lines and process
+    return text.split('\n').map((line, idx) => {
+      // Bold text
+      let formattedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-foreground">$1</strong>');
+      
+      // Check if line is a bullet point
+      const isBullet = line.trim().startsWith('•') || line.trim().startsWith('-') || line.trim().startsWith('*');
+      
+      // Check if line is numbered
+      const isNumbered = /^\d+[\.\)]\s/.test(line.trim());
+      
+      return (
+        <span 
+          key={idx} 
+          className={cn(
+            "block",
+            isBullet && "pl-2 before:content-[''] before:mr-1",
+            isNumbered && "pl-1",
+            line.trim() === "" && "h-2"
+          )}
+          dangerouslySetInnerHTML={{ __html: formattedLine || '&nbsp;' }}
+        />
+      );
+    });
+  };
 
   return (
     <div
@@ -47,7 +76,18 @@ export function ChatMessage({ role, content, isLoading }: ChatMessageProps) {
             <span className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
           </div>
         ) : (
-          <p className="whitespace-pre-wrap text-sm leading-relaxed">{content}</p>
+          <div className="text-sm leading-relaxed space-y-1">
+            {formatContent(content)}
+            {image && (
+              <div className="mt-3">
+                <img 
+                  src={image} 
+                  alt="Generated illustration" 
+                  className="max-w-full rounded-lg shadow-md"
+                />
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>

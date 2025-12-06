@@ -230,21 +230,12 @@ const Chat = () => {
             /* Chat Messages */
             <div className="flex-1 overflow-y-auto py-4 space-y-4">
               {messages.map((message, index) => (
-                <div key={index}>
-                  <ChatMessage
-                    role={message.role}
-                    content={message.content}
-                  />
-                  {message.image && (
-                    <div className="ml-12 mt-2">
-                      <img 
-                        src={message.image} 
-                        alt="Generated illustration" 
-                        className="max-w-md rounded-xl shadow-lg"
-                      />
-                    </div>
-                  )}
-                </div>
+                <ChatMessage
+                  key={index}
+                  role={message.role}
+                  content={message.content}
+                  image={message.image}
+                />
               ))}
               {isLoading && messages[messages.length - 1]?.role === "user" && (
                 <ChatMessage role="assistant" content="" isLoading />
