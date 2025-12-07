@@ -4,7 +4,6 @@ AutoTutor is an intelligent, voice + video based tutoring application that uses 
 
 Students can:
 ✔ Ask doubts in real-time  
-✔ Face mock interviews  
 ✔ Get concept explanations like “Explain Like I’m 5”  
 ✔ Prepare for exams with quizzes and feedback  
 
@@ -14,13 +13,13 @@ Students can:
 
 | Feature | Description |
 |--------|-------------|
-| 🎙 Voice & Video Interaction | Chat with AI tutor like a real person |
 | 🧠 AI Tutor Modes | Doubt Clearing • Mock Interview • Concept Learning • Exam Prep |
 | 🗣 Whisper Speech-to-Text | Converts user speech to text instantly |
 | 📚 Multiple Subjects Supported | Adaptive learning across topics |
 | 💬 Realtime Streaming | No waiting — responses are instant |
 | 🔐 Secure Authentication | Supabase Auth and role-based access |
 | 🧾 Session Tracking | Stores conversation & learning progress |
+| 🎙 Voice & Video Interaction | Chat with AI tutor like a real person |
 
 ---
 
