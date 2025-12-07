@@ -1,18 +1,28 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { GraduationCap, Menu, X, MessageSquare, FileQuestion, Home } from "lucide-react";
+import { GraduationCap, Menu, X, MessageSquare, FileQuestion, Home, Video, LogIn, LogOut, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 const navItems = [
   { href: "/", label: "Home", icon: Home },
   { href: "/chat", label: "AI Tutor", icon: MessageSquare },
   { href: "/quiz", label: "Quiz Generator", icon: FileQuestion },
+  { href: "/live-session", label: "Live Session", icon: Video },
 ];
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 glass border-b border-border/50">
@@ -48,13 +58,31 @@ export function Header() {
             })}
           </nav>
 
-          {/* CTA Button */}
-          <div className="hidden md:block">
-            <Link to="/chat">
-              <Button variant="hero" size="lg">
-                Start Learning
-              </Button>
-            </Link>
+          {/* Auth Buttons */}
+          <div className="hidden md:flex items-center gap-2">
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="secondary" className="gap-2">
+                    <User className="h-4 w-4" />
+                    {user.email?.split("@")[0]}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={handleSignOut} className="gap-2 cursor-pointer">
+                    <LogOut className="h-4 w-4" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link to="/auth">
+                <Button variant="hero" size="lg" className="gap-2">
+                  <LogIn className="h-4 w-4" />
+                  Login
+                </Button>
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -87,11 +115,26 @@ export function Header() {
                   </Link>
                 );
               })}
-              <Link to="/chat" onClick={() => setIsOpen(false)}>
-                <Button variant="hero" className="w-full mt-2">
-                  Start Learning
+              {user ? (
+                <Button
+                  variant="secondary"
+                  className="w-full mt-2 gap-2"
+                  onClick={() => {
+                    handleSignOut();
+                    setIsOpen(false);
+                  }}
+                >
+                  <LogOut className="h-4 w-4" />
+                  Sign Out
                 </Button>
-              </Link>
+              ) : (
+                <Link to="/auth" onClick={() => setIsOpen(false)}>
+                  <Button variant="hero" className="w-full mt-2 gap-2">
+                    <LogIn className="h-4 w-4" />
+                    Login
+                  </Button>
+                </Link>
+              )}
             </nav>
           </div>
         )}

@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { MessageSquare, FileQuestion, Mic, Image, Globe, Clock, Sparkles, BookOpen, Calculator, Palette, Music, Code } from "lucide-react";
+import { MessageSquare, FileQuestion, Mic, Image, Globe, Clock, Sparkles, BookOpen, Calculator, Palette, Music, Code, Video, Brain } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const features = [
@@ -133,6 +133,30 @@ const features = [
           "The beautiful thing about learning is that no one can take it away from you."
         </p>
         <p className="text-xs text-primary font-medium mt-1">— B.B. King</p>
+      </div>
+    ),
+  },
+  {
+    icon: Video,
+    title: "Live Mock Session",
+    description: "Real-time voice & video sessions with AI for doubt clearing, mock interviews, and personalized tutoring.",
+    link: "/live-session",
+    gradient: "from-fuchsia-500 to-pink-600",
+    bgGradient: "from-fuchsia-500/10 to-pink-600/10",
+    preview: (
+      <div className="mt-4 p-4 rounded-lg bg-secondary/50">
+        <div className="flex items-center justify-center gap-3 mb-3">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-fuchsia-500 to-pink-600 flex items-center justify-center">
+            <Video className="w-5 h-5 text-white" />
+          </div>
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center animate-pulse">
+            <Brain className="w-5 h-5 text-white" />
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-1 justify-center">
+          <span className="px-2 py-0.5 rounded-full text-[10px] bg-fuchsia-500/20 text-fuchsia-700 dark:text-fuchsia-300">Doubt Clearing</span>
+          <span className="px-2 py-0.5 rounded-full text-[10px] bg-pink-500/20 text-pink-700 dark:text-pink-300">Mock Interview</span>
+        </div>
       </div>
     ),
   },

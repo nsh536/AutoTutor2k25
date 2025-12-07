@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Chat from "./pages/Chat";
 import Quiz from "./pages/Quiz";
+import Auth from "./pages/Auth";
+import LiveMockInterview from "./pages/LiveMockInterview";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,6 +22,8 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/quiz" element={<Quiz />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/live-session" element={<LiveMockInterview />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
