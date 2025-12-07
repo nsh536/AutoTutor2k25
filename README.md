@@ -3,6 +3,7 @@
 AutoTutor is an intelligent, voice + video based tutoring application that uses **OpenAI Realtime models**, **Whisper speech recognition**, and **Supabase backend** to provide a highly interactive learning experience.
 
 Students can:
+
 ✔ Ask doubts in real-time  
 ✔ Get concept explanations like “Explain Like I’m 5”  
 ✔ Prepare for exams with quizzes and feedback  
